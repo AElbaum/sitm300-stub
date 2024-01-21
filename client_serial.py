@@ -1,6 +1,4 @@
 import serial
-import time
-
 
 # Adjust this to the virtual serial port created by socat
 port_name = '/dev/pts/7'
@@ -10,7 +8,7 @@ ser = serial.Serial(port_name, 115200, timeout=1) # Opens the serial port
 waiting_for_reply = False
 
 
-def loop():
+def commands():
     global waiting_for_reply
     if ser.in_waiting > 0: # Checks if there is data in the buffer
         data = ser.readline() # Reads the data from the buffer
@@ -28,4 +26,4 @@ def loop():
                 print("Command not recognised, try agian.")
 
 while True:
-    loop()
+    commands()
