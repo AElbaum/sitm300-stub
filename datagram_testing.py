@@ -13,7 +13,8 @@ def normalMode():
     status = 0b10101111
     # Gyro output
     # gyro_x, gyro_y, gyro_z = [random.uniform(-300, 300) for _ in range(3)]  # Gyro data    # Gyro status byte
-    gyro_data = [random.uniform(-300, 300) for _ in range(3)]  # Gyro data for X, Y, Z axes
+    gyro_data = [random.randint(0, 2**24 - 1) for _ in range(3)]  # Gyro data for X, Y, Z axes
+    print(gyro_data)
     # Accel output
     accel_data = [random.uniform(-300, 300) for _ in range(3)]  # Accel data for X, Y, Z axes
     # Accel status byte
@@ -31,7 +32,7 @@ def normalMode():
     # Aux status byte
     # Counter
     #Latency
-    datagram = struct.pack('>Bffffff', status, *gyro_data, *accel_data, *inclinometer_data)
+    datagram = struct.pack('>Bfffffffff', status, *gyro_data, *accel_data, *inclinometer_data)
     #CRC
     crc = generate_crc(datagram)
     datagram += struct.pack('>H', crc)
@@ -56,8 +57,6 @@ def print_dynamic_datagram(datagram):
         else:
             print(f"CRC: {value}")
 
-
-# 
 
 
 datagram = normalMode()

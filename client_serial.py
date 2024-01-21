@@ -7,7 +7,7 @@ port_name = '/dev/pts/7'
 
 ser = serial.Serial(port_name, 115200, timeout=1) # Opens the serial port
 
-while True:
+def loop():
     if ser.in_waiting > 0: # Checks if there is data in the buffer
         data = ser.readline() # Reads the data from the buffer
         print(data.decode().strip()) # Decodes the data and prints it
@@ -23,5 +23,9 @@ while True:
         
 
     time.sleep(0.1) # Waits for 0.1 seconds before checking again
+
+while True:
+    loop()
+    
 
 # Commands in server mode
