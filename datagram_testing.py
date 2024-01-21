@@ -21,7 +21,7 @@ def normalMode():
     inclinometer_data = [random.uniform(-300, 300) for _ in range(3)]  # Inclinometer data for X, Y, Z axes
     # Inclinometer status byte
     # Gyro temp data which is 16 bits long
-    gyro_temp_data = 
+    # gyro_temp_data = 
     # Gyro temp status byte
     # Accel temp data
     # Accel temp status byte
