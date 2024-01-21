@@ -13,7 +13,7 @@ def onStart():
 
 # function that sends serial number to client
 def serialNumber():
-    ser.write(b'1234567\n')
+    ser.write(b'SerialNumber\n')
 
 def partNumber():
     ser.write(b'partNumber\n')
