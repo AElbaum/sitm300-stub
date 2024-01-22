@@ -5,7 +5,7 @@ port_name = '/dev/pts/7'
 
 ser = serial.Serial(port_name, 115200, timeout=1) # Opens the serial port
 
-waiting_for_reply = False
+waiting_for_reply = True
 
 
 def commands():

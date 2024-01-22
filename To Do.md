@@ -3,6 +3,9 @@ Part 1: Hardware Data Stub
 ~~1. Add flag to check for received message in client.py~~
 2. Complete normal mode datagram
 3. Complete Serial Number datagram
+    Fix bug where serial number isnt read by client on startup
+        Fixed, but need to start the client first
+        Make simulator check for client
 
 
 Part 2: Software Application

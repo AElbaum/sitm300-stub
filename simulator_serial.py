@@ -6,9 +6,9 @@ port_name = '/dev/pts/6'
 
 ser = serial.Serial(port_name, 115200, timeout=1) 
 
-def onStart():
+def onStart(): # Not sure if this is working
     print("Starting up the simulator")
-    serialNumber()
+    serialNumber() 
     normalModeDatagram()
 
 # function that sends serial number to client
@@ -59,6 +59,8 @@ def normalModeDatagram():
     #CRC
     # CR
     # LF
+
+onStart() # Isnt automatically read by client
 
 while True:
     if ser.in_waiting > 0:  # Checks if there is data in the buffer
