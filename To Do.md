@@ -20,7 +20,7 @@ General:
     "Launch script with setup, run, and clean-up options"
 2. Completed Readme
     How to run the code
-    How the system workds
+    How the system works
     Instructions to set up the environment
 3. System_Design.md
     Describes the design of the system
