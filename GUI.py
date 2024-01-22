@@ -9,7 +9,7 @@ from struct import unpack
 
 
 # from client_serial import loop
-port_name = '/dev/pts/7'
+port_name = '/dev/pts/4'
 
 ser = serial.Serial(port_name, 115200, timeout=1) # Opens the serial port
 
@@ -135,11 +135,23 @@ def check_serial():
 # Create a separate thread to check for incoming serial messages
 threading.Thread(target=check_serial, daemon=True).start() # As requested, a GUI "that refreshes automatically when the data comes into the simulator"
 
+# def NormalMode():
+
+def autoMode():
+    while True:
+        command = f'NormalMode {interval}\n'.encode()
+        ser.write(command)
+
+# options = ["N", "I", "C", "T", "E", "R", "SERVICEMODE", "UTILITYMODE"]
+# for command in options:
+#     button = tkinter.Button(m, text=command, command=lambda cmd=command: commands(cmd))
+#     button.pack()
+
+test_button = tkinter.Button(m, text="Test Serial Command", command=lambda: commands("I"))
+# test_button = tkinter.Button(m, text="Test Normal Mode", command=lambda: normalMode())
+test_button = tkinter.Button(m, text="Test Auto Mode", command=lambda: autoMode())
 
 
-options = ["N", "I", "C", "T", "E", "R", "SERVICEMODE", "UTILITYMODE"]
-for command in options:
-    button = tkinter.Button(m, text=command, command=lambda cmd=command: commands(cmd))
-    button.pack()
+test_button.pack()
 
 m.mainloop()

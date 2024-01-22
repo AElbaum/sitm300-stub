@@ -10,7 +10,7 @@ import queue
 
 
 # Adjust this to the virtual serial port created by socat
-port_name = '/dev/pts/7'
+port_name = '/dev/pts/4'
 
 ser = serial.Serial(port_name, 115200, timeout=1) # Opens the serial port
 

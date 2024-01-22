@@ -8,7 +8,7 @@ import crcmod
 counter = 0
 
 # Adjust this to the virtual serial port created by socat
-port_name = '/dev/pts/6'
+port_name = '/dev/pts/3'
 
 ser = serial.Serial(port_name, 115200, timeout=1) 
 
