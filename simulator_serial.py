@@ -1,6 +1,11 @@
 import serial
 import random
 import time
+from struct import pack
+import sys
+import crcmod
+
+
 
 
 # Adjust this to the virtual serial port created by socat
@@ -12,7 +17,18 @@ ser = serial.Serial(port_name, 115200, timeout=1)
 start_time = time.time()
 timeout = 10  # 10 seconds
 
+def calculate_crc(data):
+    # From 5.5.7: x^32 + x^26 + x^23 + x^22 + x^16 + x^12 + x^11 + x^10 + x^8 + x^7 + x^5 + x^4 + x^2 + x + 1
+    # This is represented in hexadecimal as 0x104C11DB7
+    poly = 0x104C11DB7
 
+    # Create a crc function with the specified polynomial and seed
+    crc_func = crcmod.mkCrcFun(poly, initCrc=0xFFFFFFFF, rev=False)
+
+    # Calculate CRC
+    crc = crc_func(data)
+
+    return crc
 
 
 
@@ -20,7 +36,58 @@ timeout = 10  # 10 seconds
 
 # function that sends serial number to client
 def serialNumber():
-    ser.write(b'SerialNumber\n')
+
+# Define the datagram structure
+    datagram_format = ">45B"
+
+# Create the datagram data
+    data = [ # Serial number: N0123456789ABCDEF
+        0xB5,  # Datagram identifier (without CR+LF termination)
+        0x4E,  # ASCII character for letter "N"
+        0x01,  # High nibble: 1st digit (BCD) of serial number
+        0x23,  # Low nibble: 2nd digit (BCD) of serial number
+        0x45,  # High nibble: 3rd digit (BCD) of serial number
+        0x67,  # Low nibble: 4th digit (BCD) of serial number
+        0x89,  # High nibble: 5th digit (BCD) of serial number
+        0xAB,  # Low nibble: 6th digit (BCD) of serial number
+        0xCD,  # High nibble: 7th digit (BCD) of serial number
+        0xEF,  # Low nibble: 8th digit (BCD) of serial number
+        0x01,  # High nibble: 9th digit (BCD) of serial number
+        0x23,  # Low nibble: 10th digit (BCD) of serial number
+        0x45,  # High nibble: 11th digit (BCD) of serial number
+        0x67,  # Low nibble: 12th digit (BCD) of serial number
+        0x89,  # High nibble: 13th digit (BCD) of serial number
+        0xAB,  # Low nibble: 14th digit (BCD) of serial number
+        0x00,  # For future use
+        0x00,  # For future use
+        0x00,  # For future use
+        0x00,  # For future use
+        0x00,  # For future use
+        0x00,  # For future use
+        0x00,  # For future use
+        0x00,  # For future use
+        # # Calculate the cyclic redundancy check (CRC)
+        # 0x12,  # CRC byte 1
+        # 0x34,  # CRC byte 2
+        # # Termination is enabled
+        # 0x0D,  # CR
+        # 0x0A,  # LF
+    ]
+
+    # Convert the data to bytes
+    datagram_bytes = pack(datagram_format, *data)
+
+    # Calculate CRC
+    crc = calculate_crc(datagram_bytes)
+
+    # Append CRC to the datagram
+    datagram_with_crc = datagram_bytes + pack(">I", crc) + b'\x0D\x0A'
+
+    ser.write(b'SerialNumber:\n')
+    ser.write(datagram_with_crc)
+    # return datagram_with_crc
+    
+
 
 def partNumber():
     ser.write(b'partNumber\n')
@@ -85,8 +152,8 @@ while True:
             normalModeDatagram()
             break
     if time.time() - start_time > timeout:
-        print("Server not ready, breaking loop")
-        break
+        print("Server not ready, exiting script")
+        sys.exit()
 
 
 

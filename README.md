@@ -12,5 +12,4 @@ Steps for clean Ubuntu 22.04:
     sudo apt install socat
     Configure socat
         socat -d -d pty,raw,echo=0 pty,raw,echo=0
-
-N.B. Client needs to be started first
+4. Install pip install crcmod
