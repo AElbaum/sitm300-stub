@@ -1,15 +1,22 @@
 import serial
 import random
+import time
+
 
 # Adjust this to the virtual serial port created by socat
 port_name = '/dev/pts/6'
 
 ser = serial.Serial(port_name, 115200, timeout=1) 
 
-def onStart(): # Not sure if this is working
-    print("Starting up the simulator")
-    serialNumber() 
-    normalModeDatagram()
+
+start_time = time.time()
+timeout = 10  # 10 seconds
+
+
+
+
+
+
 
 # function that sends serial number to client
 def serialNumber():
@@ -38,6 +45,7 @@ def utilityMode():
     ser.write(b'utilityMode\n')
 
 def normalModeDatagram():
+    
     # Status bits
     status = 0b10101111
     # Gyro output
@@ -59,8 +67,28 @@ def normalModeDatagram():
     #CRC
     # CR
     # LF
+    ser.write(b'normalModeDatagram\n')
 
-onStart() # Isnt automatically read by client
+
+print("Starting up the simulator")
+while True:
+    global command
+    if ser.in_waiting > 0:
+        data = ser.readline()
+        command = data.decode().strip()
+        # print(command)
+        if command == "CLIENT_READY":
+            print("Client has connected")
+            ser.write(b'SERVER_READY\n')
+            ser.reset_input_buffer()
+            serialNumber() 
+            normalModeDatagram()
+            break
+    if time.time() - start_time > timeout:
+        print("Server not ready, breaking loop")
+        break
+
+
 
 while True:
     if ser.in_waiting > 0:  # Checks if there is data in the buffer
