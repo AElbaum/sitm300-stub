@@ -27,6 +27,7 @@ def calculate_crc(data):
 
     # Calculate CRC
     crc = crc_func(data)
+    # print("CRC: ", crc)
 
     return crc
 
@@ -36,28 +37,22 @@ def calculate_crc(data):
 
 # function that sends serial number to client
 def serialNumber():
-
+    # print("Serial Number triggered")
 # Define the datagram structure
-    datagram_format = ">45B"
+    datagram_format = ">18B"
 
 # Create the datagram data
     data = [ # Serial number: N0123456789ABCDEF
-        0xB5,  # Datagram identifier (without CR+LF termination)
+        0xB7,  # Datagram identifier (without CR+LF termination)
         0x4E,  # ASCII character for letter "N"
-        0x01,  # High nibble: 1st digit (BCD) of serial number
-        0x23,  # Low nibble: 2nd digit (BCD) of serial number
-        0x45,  # High nibble: 3rd digit (BCD) of serial number
-        0x67,  # Low nibble: 4th digit (BCD) of serial number
-        0x89,  # High nibble: 5th digit (BCD) of serial number
-        0xAB,  # Low nibble: 6th digit (BCD) of serial number
-        0xCD,  # High nibble: 7th digit (BCD) of serial number
-        0xEF,  # Low nibble: 8th digit (BCD) of serial number
-        0x01,  # High nibble: 9th digit (BCD) of serial number
-        0x23,  # Low nibble: 10th digit (BCD) of serial number
-        0x45,  # High nibble: 11th digit (BCD) of serial number
-        0x67,  # Low nibble: 12th digit (BCD) of serial number
-        0x89,  # High nibble: 13th digit (BCD) of serial number
-        0xAB,  # Low nibble: 14th digit (BCD) of serial number
+        0x01,  
+        0x23,  
+        0x45,  
+        0x67,  
+        0x89,  
+        0xAB,  
+        0xCD,
+        0xEF,
         0x00,  # For future use
         0x00,  # For future use
         0x00,  # For future use
@@ -66,17 +61,15 @@ def serialNumber():
         0x00,  # For future use
         0x00,  # For future use
         0x00,  # For future use
-        # # Calculate the cyclic redundancy check (CRC)
-        # 0x12,  # CRC byte 1
-        # 0x34,  # CRC byte 2
-        # # Termination is enabled
-        # 0x0D,  # CR
-        # 0x0A,  # LF
+        # CRC byte 1
+        # CRC byte 2
+        # 0x0D,  # CR to be appended later
+        # 0x0A,  # LF to be appended later
     ]
 
     # Convert the data to bytes
     datagram_bytes = pack(datagram_format, *data)
-
+    # print("Datagram: ", datagram_bytes)
     # Calculate CRC
     crc = calculate_crc(datagram_bytes)
 
@@ -90,26 +83,25 @@ def serialNumber():
 
 
 def partNumber():
-    ser.write(b'partNumber\n')
+    ser.write(b'Part Number datagram is unavailable, try a different command\n')
 
 def configuration():
-    ser.write(b'configuration\n')
-
+    ser.write(b'Configuration datagram\n')
 
 def biasTrimOffset():
-    ser.write(b'biasTrimOffset\n')
+    ser.write(b'Bias Trim Offset datagram is unavailable, try a different command\n')
 
 def error():
-    ser.write(b'error\n')
+    ser.write(b'Error datagram is unavailable, try a different command\n')
 
 def reset():
-    ser.write(b'reset\n')
+    ser.write(b'Reset datagram is unavailable, try a different command\n')
 
 def serviceMode():
-    ser.write(b'serviceMode\n')
+    ser.write(b'Service mode is unavailable, try a different command\n')
 
 def utilityMode():
-    ser.write(b'utilityMode\n')
+    ser.write(b'Utility mode is unavailable, try a different command\n')
 
 def normalModeDatagram():
     
