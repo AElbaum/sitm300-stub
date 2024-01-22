@@ -4,6 +4,9 @@ import time
 from struct import unpack
 import sys
 import crcmod
+from pprint import pprint
+import keyboard
+
 
 
 # Adjust this to the virtual serial port created by socat
@@ -21,7 +24,8 @@ def verify_crc(datagram, crc):
     # print("Calculated CRC: ", calculated_crc)
     return calculated_crc == crc
 
-def decode_serialNumber(datagram):
+
+def decode(datagram):
     # Assuming the CRC is 4 bytes, CR and LF are 1 byte each
     datagram_without_crc_cr_lf = datagram[:-6]
     crc_received = unpack('>I', datagram[-6:-2])[0]
@@ -30,16 +34,45 @@ def decode_serialNumber(datagram):
         raise ValueError("CRC check failed")
 
     # Unpack the datagram - adjust the format string to match your datagram structure
-    datagram_format = '>18B'  # Example: 45 data bytes
+    byte_count = len(datagram_without_crc_cr_lf)
+    # print("Byte count: ", byte_count)
+    # Use the byte count in the format string
+    datagram_format = '>' + str(byte_count) + 'B'
     data = unpack(datagram_format, datagram_without_crc_cr_lf)
-    # Extract the serial number or other relevant parts
-    # This depends on how your data is structured
-    serial_number = data[1:15]  # Example: bytes 2 to 15 contain the serial number
-    # Convert bytes to a human-readable format if necessary
-    serial_number_str = chr(serial_number[0]) + ''.join(format(byte, '02x') for byte in serial_number[1:])
-    serial_number_str = serial_number_str.upper()  # Convert to uppercase
 
-    return serial_number_str
+    # Check if serial datagram
+    if byte_count == 18:
+        serial_number = data[1:byte_count-1]  # Example: bytes 2 to (byte_count-1) contain the serial number
+        # Convert bytes to a human-readable format if necessary
+        serial_number_str = chr(serial_number[0]) + ''.join(format(byte, '02x') for byte in serial_number[1:])
+        serial_number_str = serial_number_str.upper()  # Convert to uppercase
+
+        print(serial_number_str)
+        return serial_number_str
+
+    elif byte_count == 23:
+
+        datagram_dict = {
+            "Datagram identifier": data[0],
+            "Gyro output": data[1:4],
+            "Gyro status byte": data[4],
+            "Accel output": data[5:8],
+            "Accel status byte": data[8],
+            "Inclinometer output": data[9:12],
+            "Inclinometer status byte": data[12],
+            "Gyro temp data": data[13],
+            "Gyro temp status byte": data[14],
+            "Accel temp data": data[15],
+            "Accel temp status byte": data[16],
+            "Inclinometer temp data": data[17],
+            "Inclinometer temp status byte": data[18],
+            "Aux output": data[19],
+            "Aux status byte": data[20],
+            "Counter": data[21],
+            "Random byte": data[22]
+        }
+        pprint(datagram_dict)
+    return datagram_dict
 
 while True:
     ser.write(b'CLIENT_READY\n')  # Send a message to the server to indicate readiness
@@ -47,7 +80,7 @@ while True:
     if ser.in_waiting > 0: # Checks if there is data in the buffer
         data = ser.readline() # Reads the data from the buffer
         if data[-2:] == b'\r\n':
-            decoded_data = decode_serialNumber(data)
+            decoded_data = decode(data)
             print(decoded_data)
         else:
             decoded_data = data.decode().strip()
@@ -58,39 +91,42 @@ while True:
         print("Server not ready, stopping script")
         sys.exit()
 
-
+stop_thread = threading.Event()
 def check_serial():
-    while True:
+    while not stop_thread.is_set():
         if ser.in_waiting > 0: # Checks if there is data in the buffer
             data = ser.readline() # Reads the data from the buffer
             # print("The last two values are ", data[-2:])
             if data[-2:] == b'\r\n':
                 # print("datagram detected")
-                decoded_data = decode_serialNumber(data)
-                print(decoded_data)
-
+                # print(data)
+                decoded_data = decode(data)
+                # print(decoded_data)
+            elif data[-1:] == b'\n':
+                print(data)
             else:
                 # print("Data is not a datagram")
+                # print(data)
                 decoded_data = data.decode().strip()
-                print(decoded_data)
+                # print(decoded_data)
 
 
 
 # Create a separate thread to check for incoming serial messages
-threading.Thread(target=check_serial, daemon=True).start()
+thread = threading.Thread(target=check_serial, daemon=True)
+thread.start()
 
 time.sleep(1)
 
-def commands():
-    if ser.out_waiting == 0:
-        command = input("Enter a command: ")
-        if command in ["N", "I", "C", "T", "E", "R", "SERVICEMODE", "UTILITYMODE"]:
-            ser.write(command.encode())
-            # waiting_for_reply = True
-            time.sleep(2) # Waits for 0.1 seconds before checking again
-        else:
-            print("Command not recognised, try agian.")
-
+# if ser.out_waiting == 0:
+frequency = float(input("Enter the frequency (Hz) for normal datagram requests: "))
+interval = 1.0 / frequency  # Convert frequency to interval in seconds
 
 while True:
-    commands()
+    # stop_thread.set()
+    # time.sleep(interval)
+    # Send message with "Normal Mode" command and the interval length
+    command = f'NormalMode {interval}\n'.encode()
+    ser.write(command)
+
+

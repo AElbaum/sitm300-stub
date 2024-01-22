@@ -13,3 +13,4 @@ Steps for clean Ubuntu 22.04:
     Configure socat
         socat -d -d pty,raw,echo=0 pty,raw,echo=0
 4. Install pip install crcmod
+5. pip install keyboard

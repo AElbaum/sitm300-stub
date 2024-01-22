@@ -5,8 +5,7 @@ from struct import pack
 import sys
 import crcmod
 
-
-
+counter = 0
 
 # Adjust this to the virtual serial port created by socat
 port_name = '/dev/pts/6'
@@ -40,7 +39,7 @@ def serialNumber():
     # print("Serial Number triggered")
 # Define the datagram structure
     datagram_format = ">18B"
-
+    
 # Create the datagram data
     data = [ # Serial number: N0123456789ABCDEF
         0xB7,  # Datagram identifier (without CR+LF termination)
@@ -80,7 +79,59 @@ def serialNumber():
     ser.write(datagram_with_crc)
     # return datagram_with_crc
     
+def normalModeDatagram():
+    global counter  
 
+    datagram_format = ">23B"
+
+    gyro_x, gyro_y, gyro_z = (int(random.uniform(0, 255)) for _ in range(3))
+    accel_x, accel_y, accel_z = (int(random.uniform(0, 10)) for _ in range(3))
+    inclinometer_x, inclinometer_y, inclinometer_z = (int(random.uniform(0, 3)) for _ in range(3))
+    gyro_temp = int(random.uniform(0, 100))
+    accel_temp = int(random.uniform(0, 100))
+    inclinometer_temp = int(random.uniform(0, 100))
+    aux_output = int(random.uniform(0, 3))
+
+    data = [
+        0b10101111, # Datagram identifier
+        gyro_x, gyro_y, gyro_z, # Gyro output
+        0b00000000, # Gyro status byte
+        accel_x, accel_y, accel_z, # Accel output
+        0b00000000, # Accel status byte
+        inclinometer_x, inclinometer_y, inclinometer_z, # Inclinometer output
+        0b00000000, # Inclinometer status byte
+        gyro_temp, # Gyro temp data
+        0b00000000, # Gyro temp status byte
+        accel_temp, # Accel temp data
+        0b00000000,    # Accel temp status byte
+        inclinometer_temp, # Inclinometer temp data
+        0b00000000, # Inclinometer temp status byte
+        aux_output, # Aux output
+        0b00000000, # Aux status byte
+        counter, # Counter
+        random.randint(0, 255)
+        #random.randint(0, 65535), # Latency as unsigned word
+        # CRC byte 1
+        # CRC byte 2
+        # 0x0D,  # CR to be appended later
+        # 0x0A,  # LF to be appended later
+    ]
+
+    counter = (counter + 1) % 256 # Increment counter and wrap around at 256
+
+
+    # Convert the data to bytes
+    datagram_bytes = pack(datagram_format, *data)
+    # print("Datagram: ", datagram_bytes)
+    # Calculate CRC
+    crc = calculate_crc(datagram_bytes)
+
+    # Append CRC to the datagram
+    datagram_with_crc = datagram_bytes + pack(">I", crc) + b'\x0D\x0A'
+
+    ser.write(b'NormalMode:\n')
+    ser.write(datagram_with_crc)
+    # print(datagram_with_crc)
 
 def partNumber():
     ser.write(b'Part Number datagram is unavailable, try a different command\n')
@@ -103,30 +154,7 @@ def serviceMode():
 def utilityMode():
     ser.write(b'Utility mode is unavailable, try a different command\n')
 
-def normalModeDatagram():
-    
-    # Status bits
-    status = 0b10101111
-    # Gyro output
-    gyro_x, gyro_y, gyro_z = [random.uniform(-300, 300) for _ in range(3)]  # Gyro data    # Gyro status byte
-    # Accel output
-    # Accel status byte
-    # Inclinometer output
-    # Inclinometer status byte
-    # Gyro temp data
-    # Gyro temp status byte
-    # Accel temp data
-    # Accel temp status byte
-    # Inclinometer temp data
-    # Inclinometer temp status byte
-    # Aux output
-    # Aux status byte
-    # Counter
-    #Latency
-    #CRC
-    # CR
-    # LF
-    ser.write(b'normalModeDatagram\n')
+
 
 
 print("Starting up the simulator")
@@ -154,7 +182,12 @@ while True:
         data = ser.readline()  # Reads the data from the buffer
         command = data.decode().strip()
         print("Received message: ", command)  # Decodes the data and prints it
-        if command == "N":
+        if command.startswith("NormalMode"):
+            interval = float(command.split()[1])
+            time.sleep(interval)
+            normalModeDatagram()
+            # time.sleep(2)
+        elif command == "N":
             partNumber()
         elif command == "I":
             serialNumber()
