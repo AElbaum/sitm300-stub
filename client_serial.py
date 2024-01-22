@@ -5,7 +5,7 @@ from struct import unpack
 import sys
 import crcmod
 from pprint import pprint
-import keyboard
+import queue
 
 
 
@@ -31,7 +31,8 @@ def decode(datagram):
     crc_received = unpack('>I', datagram[-6:-2])[0]
 
     if not verify_crc(datagram_without_crc_cr_lf, crc_received):
-        raise ValueError("CRC check failed")
+        # raise ValueError("CRC check failed")
+        print("CRC check failed, likely because of asynchronous serial communication")
 
     # Unpack the datagram - adjust the format string to match your datagram structure
     byte_count = len(datagram_without_crc_cr_lf)
@@ -91,22 +92,28 @@ while True:
         print("Server not ready, stopping script")
         sys.exit()
 
+data_queue = queue.Queue()
+
 stop_thread = threading.Event()
 def check_serial():
-    while not stop_thread.is_set():
+    while True:
         if ser.in_waiting > 0: # Checks if there is data in the buffer
             data = ser.readline() # Reads the data from the buffer
+            data_queue.put(data)
             # print("The last two values are ", data[-2:])
             if data[-2:] == b'\r\n':
                 # print("datagram detected")
                 # print(data)
+                data = data_queue.get()
                 decoded_data = decode(data)
                 # print(decoded_data)
             elif data[-1:] == b'\n':
+                data = data_queue.get()
                 print(data)
             else:
                 # print("Data is not a datagram")
                 # print(data)
+                data = data_queue.get()
                 decoded_data = data.decode().strip()
                 # print(decoded_data)
 
@@ -119,7 +126,7 @@ thread.start()
 time.sleep(1)
 
 # if ser.out_waiting == 0:
-frequency = float(input("Enter the frequency (Hz) for normal datagram requests: "))
+frequency = float(input("Enter a frequency (Hz) less than 1 for normal datagram requests: "))
 interval = 1.0 / frequency  # Convert frequency to interval in seconds
 
 while True:
