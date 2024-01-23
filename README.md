@@ -13,8 +13,6 @@ For an overview of how the code functions, see SYSTEM_DESIGN.ms
     pip install pyserial
 3. Install socat
     sudo apt install socat
-    Configure socat
-        socat -d -d pty,raw,echo=0 pty,raw,echo=0
 4. Install pip
     pip install crcmod
 5. Install Tkinter
