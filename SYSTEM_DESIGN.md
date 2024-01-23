@@ -19,4 +19,4 @@ The GUI communicates with the simulator in a similar way to the client, over ser
 
 ## Data Structure:
 
-![Data Structure](misc/Data Structure.png)
+![Data Structure](https://github.com/AElbaum/sitm300-stub/assets/38393230/171f19da-dbe3-4428-bf12-336b1909a7ab)
