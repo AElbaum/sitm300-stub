@@ -8,13 +8,14 @@ import crcmod
 counter = 0
 
 # Adjust this to the virtual serial port created by socat
-port_name = '/dev/pts/3'
+# port_name = sys.argv[0]
+port_name = '/dev/pts/1'
 
 ser = serial.Serial(port_name, 115200, timeout=1) 
 
 
 start_time = time.time()
-timeout = 10  # 10 seconds
+timeout = 20 
 
 def calculate_crc(data):
     # From 5.5.7: x^32 + x^26 + x^23 + x^22 + x^16 + x^12 + x^11 + x^10 + x^8 + x^7 + x^5 + x^4 + x^2 + x + 1

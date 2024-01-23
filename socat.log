@@ -1,0 +1,7 @@
+2024/01/23 12:50:17 socat[188467] N PTY is /dev/pts/5
+2024/01/23 12:50:17 socat[188467] N PTY is /dev/pts/6
+2024/01/23 12:50:17 socat[188467] N starting data transfer loop with FDs [5,5] and [7,7]
+2024/01/23 12:50:18 socat[188467] N socat_signal(): handling signal 15
+2024/01/23 12:50:18 socat[188467] W exiting on signal 15
+2024/01/23 12:50:18 socat[188467] N socat_signal(): finishing signal 15
+2024/01/23 12:50:18 socat[188467] N exit(143)

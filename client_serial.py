@@ -10,12 +10,15 @@ import queue
 
 
 # Adjust this to the virtual serial port created by socat
-port_name = '/dev/pts/4'
+# port_name = sys.argv[1]
+port_name = '/dev/pts/2'
 
 ser = serial.Serial(port_name, 115200, timeout=1) # Opens the serial port
 
 start_time = time.time()
 timeout = 10
+
+print("Client Started")
 
 def verify_crc(datagram, crc):
     poly = 0x104C11DB7

@@ -7,9 +7,10 @@ import crcmod
 from pprint import pprint
 from struct import unpack
 
+print("GUI is starting")
 
 # from client_serial import loop
-port_name = '/dev/pts/4'
+port_name = '/dev/pts/2'
 
 ser = serial.Serial(port_name, 115200, timeout=1) # Opens the serial port
 
