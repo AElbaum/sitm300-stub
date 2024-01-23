@@ -18,8 +18,7 @@ For an overview of how the code functions, see SYSTEM_DESIGN.ms
 4. Install pip
     pip install crcmod
 5. Install Tkinter
-    https://github.com/AElbaum/sitm300-stub.git
-
+    sudo apt install python3-tk
 
 ## Running the Code
 
