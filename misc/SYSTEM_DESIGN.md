@@ -15,3 +15,8 @@ Once connected, the client receives the serial number from the simulator, a samp
 # GUI
 The graphical user interface is built with tkinter and proviues a user-friender method for interacting with the simulator.
 The GUI communicates with the simulator in a similar way to the client, over serial, but instead of dumping data in the termninal, the information is displayed on screen in the GUI.
+
+
+## Data Structure:
+
+![Data Structure](misc/Data Structure.png)
