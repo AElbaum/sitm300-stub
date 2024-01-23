@@ -15,8 +15,10 @@ For an overview of how the code functions, see SYSTEM_DESIGN.ms
     sudo apt install socat
     Configure socat
         socat -d -d pty,raw,echo=0 pty,raw,echo=0
-4. Install pip install crcmod
-5. pip install keyboard
+4. Install pip
+    pip install crcmod
+5. Install Tkinter
+    https://github.com/AElbaum/sitm300-stub.git
 
 
 ## Running the Code
@@ -27,5 +29,15 @@ For an overview of how the code functions, see SYSTEM_DESIGN.ms
 4. run: "chmod +x run_client.sh
 5. run: "chmod +x run_GUI.sh
 6. To start the code, first run "./setup.sh", this creates the virtual serial connection
-7. Next, to either start client or GUI, enter "./run_client" or "./run_GUI"
+    Check note of the output, it shoudl look like this:
+    2024/01/23 23:50:09 socat[28832] N PTY is /dev/pts/1
+    2024/01/23 23:50:09 socat[28832] N PTY is /dev/pts/2
+    2024/01/23 23:50:09 socat[28832] N starting data transfer loop with FDs [5,5] and [7,7]
 
+    If the ports are not /dev/pts/1 and /dev/pts/2, then type ctrl+C to kill the program and start it again, this should correct the error
+    If this error remains, you may change the ports in the simulator_serial.py and client_serial.py files.
+
+
+
+7. Next, to either start client or GUI, enter "./run_client" or "./run_GUI"
+    These cannot be run at the same time, so make sure to close both simulator and client terminals before running the run_GUI.sh script
