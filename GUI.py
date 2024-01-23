@@ -6,6 +6,7 @@ import threading
 import crcmod
 from pprint import pprint
 from struct import unpack
+from tkinter import simpledialog
 
 print("GUI is starting")
 
@@ -37,7 +38,7 @@ def decode(datagram):
     # Assuming the CRC is 4 bytes, CR and LF are 1 byte each
     datagram_without_crc_cr_lf = datagram[:-6]
     crc_received = unpack('>I', datagram[-6:-2])[0]
-
+    datagram_dict = {}
     if not verify_crc(datagram_without_crc_cr_lf, crc_received):
         # raise ValueError("CRC check failed")
         print("CRC check failed, likely because of asynchronous serial communication")
@@ -124,6 +125,9 @@ def check_serial():
                 # print(decoded_data)
             elif data[-1:] == b'\n':
                 print(data)
+
+                output.insert(tkinter.END, f"Received: {data}\n")
+
             else:
                 # print("Data is not a datagram")
                 # print(data)
@@ -138,21 +142,35 @@ threading.Thread(target=check_serial, daemon=True).start() # As requested, a GUI
 
 # def NormalMode():
 
+# def autoMode():
+#     while True:
+#         interval = 1
+#         command = f'NormalMode {interval}\n'.encode()
+#         ser.write(command)
+
 def autoMode():
-    while True:
+    interval = prompt_user()
+    for i in range(5):
         command = f'NormalMode {interval}\n'.encode()
         ser.write(command)
 
-# options = ["N", "I", "C", "T", "E", "R", "SERVICEMODE", "UTILITYMODE"]
-# for command in options:
-#     button = tkinter.Button(m, text=command, command=lambda cmd=command: commands(cmd))
-#     button.pack()
+def prompt_user():
+    root = tkinter.Tk()
+    root.withdraw()  # Hide the main window
+    user_input = simpledialog.askstring(title="Test", prompt="Please enter a Frequency (Hz):")
+    return user_input        
 
-test_button = tkinter.Button(m, text="Test Serial Command", command=lambda: commands("I"))
-# test_button = tkinter.Button(m, text="Test Normal Mode", command=lambda: normalMode())
-test_button = tkinter.Button(m, text="Test Auto Mode", command=lambda: autoMode())
+options = ["N", "I", "C", "T", "E", "R", "SERVICEMODE", "UTILITYMODE"]
+for command in options:
+    button = tkinter.Button(m, text=command, command=lambda cmd=command: commands(cmd))
+    button.pack()
 
+serialButton = tkinter.Button(m, text="Test Serial Command", command=lambda: commands("I"))
+# normalButton = tkinter.Button(m, text="Test Normal Mode", command=lambda: normalMode())
+autoButton = tkinter.Button(m, text="Test Auto Mode", command=lambda: autoMode())
 
-test_button.pack()
+# normalButton.pack()
+serialButton.pack()
+autoButton.pack()
 
 m.mainloop()
